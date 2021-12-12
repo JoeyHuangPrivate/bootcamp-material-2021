@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <button id="click-start">Click</button>
+    <button id="post-start">Post</button>
+    <div id="results"></div>
+  </body>
+  <script>
+
+    function displayStudents() {
+      fetch("/api/students")
+          .then((res) => {
+            console.log("fetch:", res);
+            return res.json();
+          })
+          .then((students) => {
+            console.log(students);
+            
+            var html = students.map((student) => {
+              return `<li> ${student.firstName} ${student.lastName} </li>`;
+            });
+
+            document.getElementById("results").innerHTML = html.join("");
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+    }
+
+    function addStudent() {
+      const newStudent = {
+          username: "jemelwilliams",
+          firstName: "Jemel",
+          lastName: "Williams",
+          address: {
+            street: "101 Main Street",
+            city: "New York",
+            state: "New York",
+            location: {
+              lat: 0.0,
+              long: 0.0,
+            },
+          },
+        };
+
+        fetch("/api/students", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newStudent),
+        })
+          .then((res) => {
+            return res.json();
+          })
+          .then((res) => {
+            const students = res;
+
+            // ??
+            console.log("Post students ", students);
+            const ulEl = document.createElement("ul");
+            students.map(student => {
+              const liEl = document.createElement('li');
+              liEl.textContent = `${student.firstName} ${student.lastName}`;
+
+              console.log(liEl);
+
+              ulEl.appendChild(liEl);
+            });
+            document.body.append(ulEl);
+          });
+    }
+
+    function handleClick(e) {
+      console.log(e.target.id);
+      const idBtn = e.target.id;
+
+      // Get
+      if (idBtn === "click-start") {
+        displayStudents();
+      } else if (idBtn === "post-start") {
+        // Post
+        addStudent();
+      }
+    };
+
+    document.getElementById("click-start").onclick = handleClick;
+    document.getElementById("post-start").onclick = handleClick;
+    // document.getElementById("click-start").onclick = () => handleClick("hello");
+
+    // document.getElementById("click-start").addEventListner("click", handleClick);
+  </script>
+</html>
